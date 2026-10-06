@@ -26,8 +26,7 @@
  * Block greeting definition.
  */
 class block_greeting extends block_base {
-    // Moodle's block_base declares no init() of its own — #[\Override] would fatal
-    // (PHP 8.3+ requires a real parent method to override; there isn't one here).
+    // Moodle's block_base declares no init() of its own — #[\Override] would fatal.
     /**
      * Set the block title.
      */
@@ -40,9 +39,24 @@ class block_greeting extends block_base {
         if ($this->content !== null) {
             return $this->content;
         }
+
+        global $OUTPUT;
+
+        $message = \block_greeting\local\greeting_text::get_message();
         $this->content = new stdClass();
-        $this->content->text = '';
+        $this->content->text = $OUTPUT->render_from_template('block_greeting/content', ['greeting' => $message]);
+        $this->page->requires->js_call_amd('block_greeting/greeting', 'init');
         $this->content->footer = '';
+
         return $this->content;
+    }
+
+    /**
+     * Define all block contexts where this block is applicable.
+     *
+     * @return array
+     */
+    public function applicable_formats(): array {
+        return ['all' => true];
     }
 }
